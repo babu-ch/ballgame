@@ -158,9 +158,16 @@ export default class MyScene extends Phaser.Scene {
         })
     }
 
+    // SPとPCで描画場所変える
+    // 本当はPCでも割合計算すればマジックナンバー不要かも
+    // y座標は対応さぼった
     drawGameOverTexts() {
-        this.add.text(300, 300, `GAMEOVER score: ${this.score}`, {fontSize:20})
-        const button = this.add.text(400, 400, "RETRY", { fontSize: "32px"})
+        const x = isPc ? 400 : (window.innerWidth /2)
+        const scoreText = isPc ? `GAMEOVER score: ${this.score}`: `GAMEOVER\nscore: ${this.score}`
+        this.add.text(x, 300, scoreText, {fontSize:20}).setOrigin(0.5)
+
+        const buttonX = isPc ? 400 : (window.innerWidth /2)
+        const button = this.add.text(buttonX, 400, "RETRY", { fontSize: "32px"})
         button.setOrigin(0.5)
         button.on("pointerdown",  () => {
             this.scene.restart()
