@@ -3,6 +3,7 @@ import {random, last} from "lodash";
 import Arc = Phaser.GameObjects.Arc;
 import Body = Phaser.Physics.Arcade.Body;
 import Text = Phaser.GameObjects.Text;
+import {isPc} from "../util.ts";
 
 // ボールの種類 score=消した時の点数 size=大きさ  color=色
 const BALL_TYPES = [
@@ -52,7 +53,13 @@ export default class MyScene extends Phaser.Scene {
         this.add.line(0, GAMEOVER_LINE_Y, 1600, 0, 0, 0, 0xff)
 
         // クリックした時
-        this.input.on("pointerdown", () => {this.onClick()})
+        if (isPc) {
+            this.input.on("pointerdown", () => {this.onClick()});
+        } else {
+            this.input.on("pointerup", () => {
+                this.onClick()
+            })
+        }
 
         // 最初のボールを作成
         this.ball = this.add.circle(400, 100, BALL_TYPES[0].size/2, BALL_TYPES[0].color)
@@ -64,7 +71,11 @@ export default class MyScene extends Phaser.Scene {
     update() {
         // 発射前のボールはマウスに追従させる
         if (!this.ball!.body) {
-            this.ball!.x = this.input.mousePointer.x
+            if (isPc) {
+                this.ball!.x = this.input.mousePointer.x;
+            } else {
+                this.ball!.x = this.input.activePointer.x;
+            }
         }
     }
 
@@ -82,13 +93,7 @@ export default class MyScene extends Phaser.Scene {
                 // ゲームオーバー判定  最後のボールがラインを超えたか？
                 if ((ball1 === this.lastBall || ball2 === this.lastBall) && this.lastBall.y < GAMEOVER_LINE_Y) {
                     this.gameOver = true
-                    this.add.text(300, 300, `GAMEOVER score: ${this.score}`, {fontSize:20})
-                    const button = this.add.text(400, 400, "RETRY", { fontSize: "32px"})
-                    button.setOrigin(0.5)
-                    button.on("pointerdown",  () => {
-                        this.scene.restart()
-                    })
-                    button.setInteractive()
+                    this.drawGameOverTexts()
                 }
                 return
             }
@@ -151,6 +156,23 @@ export default class MyScene extends Phaser.Scene {
                 this.nextBallReady = true
             }
         })
+    }
+
+    // SPとPCで描画場所変える
+    // 本当はPCでも割合計算すればマジックナンバー不要かも
+    // y座標は対応さぼった
+    drawGameOverTexts() {
+        const x = isPc ? 400 : (window.innerWidth /2)
+        const scoreText = isPc ? `GAMEOVER score: ${this.score}`: `GAMEOVER\nscore: ${this.score}`
+        this.add.text(x, 300, scoreText, {fontSize:20}).setOrigin(0.5)
+
+        const buttonX = isPc ? 400 : (window.innerWidth /2)
+        const button = this.add.text(buttonX, 400, "RETRY", { fontSize: "32px"})
+        button.setOrigin(0.5)
+        button.on("pointerdown",  () => {
+            this.scene.restart()
+        })
+        button.setInteractive()
     }
 }
 
