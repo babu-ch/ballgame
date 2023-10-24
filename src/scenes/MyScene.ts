@@ -93,13 +93,7 @@ export default class MyScene extends Phaser.Scene {
                 // ゲームオーバー判定  最後のボールがラインを超えたか？
                 if ((ball1 === this.lastBall || ball2 === this.lastBall) && this.lastBall.y < GAMEOVER_LINE_Y) {
                     this.gameOver = true
-                    this.add.text(300, 300, `GAMEOVER score: ${this.score}`, {fontSize:20})
-                    const button = this.add.text(400, 400, "RETRY", { fontSize: "32px"})
-                    button.setOrigin(0.5)
-                    button.on("pointerdown",  () => {
-                        this.scene.restart()
-                    })
-                    button.setInteractive()
+                    this.drawGameOverTexts()
                 }
                 return
             }
@@ -162,6 +156,16 @@ export default class MyScene extends Phaser.Scene {
                 this.nextBallReady = true
             }
         })
+    }
+
+    drawGameOverTexts() {
+        this.add.text(300, 300, `GAMEOVER score: ${this.score}`, {fontSize:20})
+        const button = this.add.text(400, 400, "RETRY", { fontSize: "32px"})
+        button.setOrigin(0.5)
+        button.on("pointerdown",  () => {
+            this.scene.restart()
+        })
+        button.setInteractive()
     }
 }
 
