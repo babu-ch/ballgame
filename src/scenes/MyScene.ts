@@ -77,23 +77,22 @@ export default class MyScene extends Phaser.Scene {
             if (!(ball1 instanceof Arc) || !(ball2 instanceof Arc)) {
                 return
             }
-            // ゲームオーバー判定  最後のボールがラインを超えたか？
-            if ((ball1 === this.lastBall || ball2 === this.lastBall) && this.lastBall.y < GAMEOVER_LINE_Y) {
-                this.gameOver = true
-                this.add.text(300, 300, `GAMEOVER score: ${this.score}`, {fontSize:20})
-                const button = this.add.text(400, 400, "RETRY", { fontSize: "32px"})
-                button.setOrigin(0.5)
-                button.on("pointerdown",  () => {
-                    this.scene.restart()
-                })
-                button.setInteractive()
+            // 大きさが同じボールのみ消す
+            if (ball1.width !== ball2.width) {
+                // ゲームオーバー判定  最後のボールがラインを超えたか？
+                if ((ball1 === this.lastBall || ball2 === this.lastBall) && this.lastBall.y < GAMEOVER_LINE_Y) {
+                    this.gameOver = true
+                    this.add.text(300, 300, `GAMEOVER score: ${this.score}`, {fontSize:20})
+                    const button = this.add.text(400, 400, "RETRY", { fontSize: "32px"})
+                    button.setOrigin(0.5)
+                    button.on("pointerdown",  () => {
+                        this.scene.restart()
+                    })
+                    button.setInteractive()
+                }
                 return
             }
             this.nextBallReady = true
-            // 大きさが同じボールのみ消す
-            if (ball1.width !== ball2.width) {
-                return
-            }
             // スコア加算
             const currentType = BALL_TYPES.find(type => type.size === ball1.width)
             if (currentType) {
