@@ -3,6 +3,7 @@ import {random, last} from "lodash";
 import Arc = Phaser.GameObjects.Arc;
 import Body = Phaser.Physics.Arcade.Body;
 import Text = Phaser.GameObjects.Text;
+import {isPc} from "../util.ts";
 
 // ボールの種類 score=消した時の点数 size=大きさ  color=色
 const BALL_TYPES = [
@@ -52,7 +53,13 @@ export default class MyScene extends Phaser.Scene {
         this.add.line(0, GAMEOVER_LINE_Y, 1600, 0, 0, 0, 0xff)
 
         // クリックした時
-        this.input.on("pointerdown", () => {this.onClick()})
+        if (isPc) {
+            this.input.on("pointerdown", () => {this.onClick()});
+        } else {
+            this.input.on("pointerup", () => {
+                this.onClick()
+            })
+        }
 
         // 最初のボールを作成
         this.ball = this.add.circle(400, 100, BALL_TYPES[0].size/2, BALL_TYPES[0].color)
@@ -64,7 +71,11 @@ export default class MyScene extends Phaser.Scene {
     update() {
         // 発射前のボールはマウスに追従させる
         if (!this.ball!.body) {
-            this.ball!.x = this.input.mousePointer.x
+            if (isPc) {
+                this.ball!.x = this.input.mousePointer.x;
+            } else {
+                this.ball!.x = this.input.activePointer.x;
+            }
         }
     }
 
